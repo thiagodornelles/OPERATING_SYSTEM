@@ -1,7 +1,24 @@
-ORG 0x7C00
+ORG 0
 BITS 16
 
+;Ensures that CS (code segment) is 0x7C0
+JMP 0x7C0:start
+
 start:
+  CLI ;Clear interrupts
+  
+  ;Setting up manually these segments to make sure its correctly set
+  MOV ax, 0x7C0 
+  MOV ds, ax ;Set data segment
+  MOV es, ax ;Set extra segment
+
+  ;Setting up stack segments
+  MOV ax, 0
+  MOV ss, ax
+  MOV sp, 0x7C00
+
+  STI ;Enables interrupts
+
   MOV si, message
   CALL print
   JMP $
