@@ -1,10 +1,18 @@
 ORG 0
 BITS 16
 
-;Ensures that CS (code segment) is 0x7C0
-JMP 0x7C0:start
+;This routine is necessary to avoid code overwriting by BIOS BPB (BIOS Parameter Block)
+_start:
+  JMP SHORT start
+  NOP
+
+times 33 db 0
 
 start:
+  ;Ensures that CS (code segment) is 0x7C0
+  JMP 0x7C0:step2
+
+step2:
   CLI ;Clear interrupts
   
   ;Setting up manually these segments to make sure its correctly set
