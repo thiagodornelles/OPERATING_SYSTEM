@@ -27,7 +27,21 @@ step2:
 
   STI ;Enables interrupts
 
-  MOV si, message
+  ;Disc operation
+  MOV ah, 2 ;READ SECTOR Command
+  MOV al, 1 ;Read 1 sector
+  MOV ch, 0 ;Cylinder low bits
+  MOV cl, 2 ;Read sector number 2
+  MOV dh, 0 ;Head number
+  MOV bx, buffer
+  INT 0x13 ;Invoke READ SECTOR COMMAND
+  JC error ;When carry is set mean data could be not read
+  MOV si, buffer ; prints disc data
+  CALL print
+  JMP $
+
+error:
+  MOV si, error_message
   CALL print
   JMP $
 
@@ -47,6 +61,10 @@ print_char:
   INT 0x10
   RET
 
+error_message: db 'Failed to load sector', 0
+
 message: db 'Hello World!', 0
 times 510-($ - $$) db 0
 dw 0xAA55
+
+buffer:
