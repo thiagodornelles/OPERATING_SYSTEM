@@ -1,5 +1,8 @@
-ORG 0
+ORG 0x7c00
 BITS 16
+
+CODE_SEG equ gdt_code - gdt_start
+DATA_SEG equ gdt_data - gdt_start
 
 ;This routine is necessary to avoid code overwriting by BIOS BPB (BIOS Parameter Block)
 _start:
@@ -10,61 +13,73 @@ times 33 db 0
 
 start:
   ;Ensures that CS (code segment) is 0x7C0
-  JMP 0x7C0:step2
+  JMP 0:step2
 
 step2:
   CLI ;Clear interrupts
   
   ;Setting up manually these segments to make sure its correctly set
-  MOV ax, 0x7C0 
+  MOV ax, 0 
   MOV ds, ax ;Set data segment
   MOV es, ax ;Set extra segment
 
   ;Setting up stack segments
-  MOV ax, 0
   MOV ss, ax
   MOV sp, 0x7C00
 
   STI ;Enables interrupts
 
-  ;Disc operation
-  MOV ah, 2 ;READ SECTOR Command
-  MOV al, 1 ;Read 1 sector
-  MOV ch, 0 ;Cylinder low bits
-  MOV cl, 2 ;Read sector number 2
-  MOV dh, 0 ;Head number
-  MOV bx, buffer
-  INT 0x13 ;Invoke READ SECTOR COMMAND
-  JC error ;When carry is set mean data could be not read
-  MOV si, buffer ; prints disc data
-  CALL print
+load_protected:
+  CLI
+  LGDT[gdt_descriptor]
+  ;Setting the last bit of cr0 (???)
+  MOV eax, cr0
+  OR eax, 0x1
+  MOV cr0, eax
+  JMP CODE_SEG:load32
+
+
+;GDT
+gdt_start:
+gdt_null:
+  dd 0x0
+  dd 0x0
+
+; offset 0x8
+gdt_code: ; CS SHOULD POINT AT THIS
+  dw 0xffff ; Segment limit first 0-15 bits
+  dw 0 ; Base first 0-15 bits
+  db 0 ; Base 16-23 bits
+  db 0x9a ; Access byte
+  db 11001111b ; High 4 bit flags and Low 4 bits flags
+  db 0 ; Base 24-31 bits
+
+; offset 0x10
+gdt_data: ; DS, SS, ES, FS, GS
+  dw 0xffff ; Segment limit first 0-15 bits
+  dw 0 ; Base first 0-15 bits
+  db 0 ; Base 16-23 bits
+  db 0x92 ; Access byte
+  db 11001111b ; High 4 bit flags and Low 4 bits flags
+  db 0 ; Base 24-31 bits
+
+gdt_end:
+
+gdt_descriptor:
+  dw gdt_end - gdt_start-1
+  dd gdt_start
+
+[BITS 32]
+load32:
+  MOV ax, DATA_SEG
+  MOV ds, ax
+  MOV es, ax
+  MOV fs, ax
+  MOV gs, ax
+  MOV ss, ax
+  MOV ebp, 0x00200000
+  MOV esp, ebp
   JMP $
 
-error:
-  MOV si, error_message
-  CALL print
-  JMP $
-
-print:
-  MOV bx, 0
-.loop_string:
-  LODSB
-  CMP al, 0
-  JE .done
-  CALL print_char
-  JMP .loop_string  
-.done:
-  RET
-
-print_char:
-  MOV ah, 0eh    
-  INT 0x10
-  RET
-
-error_message: db 'Failed to load sector', 0
-
-message: db 'Hello World!', 0
 times 510-($ - $$) db 0
 dw 0xAA55
-
-buffer:
