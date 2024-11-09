@@ -1,1 +1,0 @@
-Ola mundo personalizado para ultrapassar 512 bytes do primeiro cluster!
