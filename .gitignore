@@ -1,2 +1,6 @@
 boot.bin
 .DS_Store
+build/kernel.asm.o
+bin/os.bin
+build/kernelfull.o
+bin/kernel.bin
