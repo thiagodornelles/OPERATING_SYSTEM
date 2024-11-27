@@ -4,3 +4,5 @@ build/kernel.asm.o
 bin/os.bin
 build/kernelfull.o
 bin/kernel.bin
+build/kernel.o
+build/kernel.o
