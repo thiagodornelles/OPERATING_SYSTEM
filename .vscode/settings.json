@@ -1,6 +1,9 @@
 {
   "files.associations": {
     "kernel.h": "c",
-    "stdint.h": "c"
+    "stdint.h": "c",
+    "config.h": "c",
+    "idt.h": "c",
+    "memory.h": "c"
   }
 }
