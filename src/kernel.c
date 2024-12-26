@@ -67,7 +67,9 @@ void kernel_main(){
 
     //Initialize INTERRUPT DESCRIPTOR TABLE
     idt_init();
+    //Test exception
     //problem();
-    outb(0x60, 0xff);
-
+    //Test interrupt
+    //outb(0x60, 0xff);
+    
 }
