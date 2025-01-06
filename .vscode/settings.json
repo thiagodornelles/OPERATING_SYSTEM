@@ -4,6 +4,9 @@
     "stdint.h": "c",
     "config.h": "c",
     "idt.h": "c",
-    "memory.h": "c"
+    "memory.h": "c",
+    "heap.h": "c",
+    "status.h": "c",
+    "kheap.h": "c"
   }
 }

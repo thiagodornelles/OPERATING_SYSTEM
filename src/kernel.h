@@ -5,6 +5,7 @@
 #define VGA_HEIGHT 20
 
 void kernel_main();
+void print_ptr_addr(void* ptr);
 void print(const char* str);
 
 #endif
