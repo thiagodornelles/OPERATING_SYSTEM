@@ -117,6 +117,7 @@ void kernel_main()
     kheap_init();
     // Initialize INTERRUPT DESCRIPTOR TABLE
     idt_init();
+    enable_interrupts();
     // Test exception
     // problem();
     // Test interrupt
@@ -127,7 +128,7 @@ void kernel_main()
     kfree(ptr);
     void *ptr4 = kheap_malloc(50);
 
-    if (ptr || ptr2)
+    if (ptr || ptr2 || ptr3 || ptr4)
     {
         print_ptr_addr(ptr);
         print_ptr_addr(ptr2);

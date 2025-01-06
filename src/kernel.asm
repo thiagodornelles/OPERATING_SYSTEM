@@ -31,7 +31,6 @@ _start:
   out 0x21, al
   ;End of remap of he master PIC
 
-  sti
   call kernel_main
   jmp $
 
