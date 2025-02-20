@@ -4,6 +4,7 @@
 #include "idt/idt.h"
 #include "io/io.h"
 #include "memory/heap/kheap.h"
+#include "memory/paging/paging.h"
 
 uint16_t *video_mem = 0;
 uint16_t terminal_row = 0;
@@ -108,6 +109,8 @@ void print(const char *str)
 
 extern void problem();
 
+static struct paging_4gb_chunk* kernel_chunk = 0;
+
 void kernel_main()
 {
     terminal_init();
@@ -117,16 +120,24 @@ void kernel_main()
     kheap_init();
     // Initialize INTERRUPT DESCRIPTOR TABLE
     idt_init();
+    //Setup paging
+    kernel_chunk = paging_new_4gb(PAGING_IS_WRITABLE | PAGING_IS_PRESENT | PAGING_ACCESS_FROM_ALL);
+    //Switch to kernel paging chunk
+    paging_switch(paging_4gb_chunk_get_directory(kernel_chunk));
+    //Enable paging
+    enable_paging();
+
+    //Enable system interrupts
     enable_interrupts();
     // Test exception
     // problem();
     // Test interrupt
     // outb(0x60, 0xff);
-    void *ptr = kheap_malloc(50);
-    void *ptr2 = kheap_malloc(5000);
-    void *ptr3 = kheap_malloc(5000);
+    void *ptr = kmalloc(50);
+    void *ptr2 = kmalloc(5000);
+    void *ptr3 = kmalloc(5000);
     kfree(ptr);
-    void *ptr4 = kheap_malloc(50);
+    void *ptr4 = kmalloc(50);
 
     if (ptr || ptr2 || ptr3 || ptr4)
     {
