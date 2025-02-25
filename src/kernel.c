@@ -124,31 +124,33 @@ void kernel_main()
     kernel_chunk = paging_new_4gb(PAGING_IS_WRITABLE | PAGING_IS_PRESENT | PAGING_ACCESS_FROM_ALL);
     //Switch to kernel paging chunk
     paging_switch(paging_4gb_chunk_get_directory(kernel_chunk));
+
+    char* ptr = kzalloc(4096);
+    uint32_t val = (uint32_t) ptr | PAGING_IS_WRITABLE | PAGING_IS_PRESENT| PAGING_ACCESS_FROM_ALL;
+    paging_set(paging_4gb_chunk_get_directory(kernel_chunk), (void*) 0x1000, val);
+
     //Enable paging
     enable_paging();
+
+    //TESTING IF PAGING IS WORKING
+    char* ptr2 = (char*) 0x1000;
+    ptr2[0] = 'A';
+    ptr2[1] = 'B';
+    print("Endereco:\n");
+    print_ptr_addr(ptr);
+    print("\nValor:\n");
+    print(ptr);
+
+    print("\n\nEndereco:\n");
+    print_ptr_addr(ptr2);
+    print("\nValor:\n");
+    print(ptr2);
+    
 
     //Enable system interrupts
     enable_interrupts();
     // Test exception
     // problem();
     // Test interrupt
-    // outb(0x60, 0xff);
-    void *ptr = kmalloc(50);
-    void *ptr2 = kmalloc(5000);
-    void *ptr3 = kmalloc(5000);
-    kfree(ptr);
-    void *ptr4 = kmalloc(50);
-
-    if (ptr || ptr2 || ptr3 || ptr4)
-    {
-        print_ptr_addr(ptr);
-        print_ptr_addr(ptr2);
-        print_ptr_addr(ptr3);
-        print_ptr_addr(ptr4);
-        print("Heap allocated\n");        
-    }
-    else
-    {
-        print("Heap allocation failed\n");
-    }
+    // outb(0x60, 0xff);    
 }
