@@ -5,6 +5,7 @@
 #include "io/io.h"
 #include "memory/heap/kheap.h"
 #include "memory/paging/paging.h"
+#include "disk/disk.h"
 
 uint16_t *video_mem = 0;
 uint16_t terminal_row = 0;
@@ -107,6 +108,34 @@ void print(const char *str)
     }
 }
 
+void print_int(int num) {
+    char buffer[12]; // Enough for an int (-2147483648 to 2147483647) + null terminator
+    int i = 0, is_negative = 0;
+
+    if (num == 0) {
+        terminal_write_char('0', 15);
+        return;
+    }
+
+    if (num < 0) {
+        is_negative = 1;
+        num = -num; // Convert to positive (note: -2147483648 needs special handling)
+    }
+
+    while (num > 0) {
+        buffer[i++] = (num % 10) + '0';
+        num /= 10;
+    }
+
+    if (is_negative) {
+        buffer[i++] = '-';
+    }
+
+    while (i > 0) {
+        terminal_write_char(buffer[--i], 15); // Print in reverse order
+    }
+}
+
 extern void problem();
 
 static struct paging_4gb_chunk* kernel_chunk = 0;
@@ -132,20 +161,9 @@ void kernel_main()
     //Enable paging
     enable_paging();
 
-    //TESTING IF PAGING IS WORKING
-    char* ptr2 = (char*) 0x1000;
-    ptr2[0] = 'A';
-    ptr2[1] = 'B';
-    print("Endereco:\n");
-    print_ptr_addr(ptr);
-    print("\nValor:\n");
-    print(ptr);
-
-    print("\n\nEndereco:\n");
-    print_ptr_addr(ptr2);
-    print("\nValor:\n");
-    print(ptr2);
-    
+    char buf[512];
+    disk_read_sector(0, 1, &buf);    
+    print_int((buf[0]));
 
     //Enable system interrupts
     enable_interrupts();
