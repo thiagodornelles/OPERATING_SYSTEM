@@ -8,6 +8,8 @@
     "heap.h": "c",
     "status.h": "c",
     "kheap.h": "c",
-    "paging.h": "c"
+    "paging.h": "c",
+    "io.h": "c",
+    "disk.h": "c"
   }
 }

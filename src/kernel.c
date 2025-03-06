@@ -147,6 +147,8 @@ void kernel_main()
 
     // Initialize KERNEL HEAP
     kheap_init();
+    //Search and initialize disks
+    disk_search_and_init();
     // Initialize INTERRUPT DESCRIPTOR TABLE
     idt_init();
     //Setup paging
@@ -161,8 +163,9 @@ void kernel_main()
     //Enable paging
     enable_paging();
 
-    char buf[512];
-    disk_read_sector(0, 1, &buf);    
+    //Testing disk routines
+    char buf[512];    
+    disk_read_block(disk_get(0), 0, 1, buf);
     print_int((buf[0]));
 
     //Enable system interrupts
