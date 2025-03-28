@@ -5,7 +5,9 @@
 #include "io/io.h"
 #include "memory/heap/kheap.h"
 #include "memory/paging/paging.h"
+#include "string/string.h"
 #include "disk/disk.h"
+#include "fs/pathparser.h"
 
 uint16_t *video_mem = 0;
 uint16_t terminal_row = 0;
@@ -52,16 +54,6 @@ void terminal_init()
             terminal_put_char(x, y, ' ', 0);
         }
     }
-}
-
-size_t strlen(const char *str)
-{
-    size_t len = 0;
-    while (str[len])
-    {
-        len++;
-    }
-    return len;
 }
 
 void getDecStr(uint8_t *str, uint8_t len, uint32_t val)
@@ -170,6 +162,9 @@ void kernel_main()
 
     //Enable system interrupts
     enable_interrupts();
+
+    struct path_root* root = pathparser_parse("0:/bin/shell.exe", NULL);
+
     // Test exception
     // problem();
     // Test interrupt

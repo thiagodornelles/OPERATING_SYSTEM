@@ -10,6 +10,8 @@
     "kheap.h": "c",
     "paging.h": "c",
     "io.h": "c",
-    "disk.h": "c"
+    "disk.h": "c",
+    "pathparser.h": "c",
+    "string.h": "c"
   }
 }
